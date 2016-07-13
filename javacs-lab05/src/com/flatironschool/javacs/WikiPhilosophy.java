@@ -32,20 +32,44 @@ public class WikiPhilosophy {
         // some example code to get you started
 
 		String url = "https://en.wikipedia.org/wiki/Java_(programming_language)";
-		Elements paragraphs = wf.fetchWikipedia(url);
 
-		Element firstPara = paragraphs.get(0);
-		
-		Iterable<Node> iter = new WikiNodeIterable(firstPara);
-		for (Node node: iter) {
-			if (node instanceof TextNode) {
-				System.out.print(node);
+		int clickCount = 0;
+
+		while (!url.equals("https://en.wikipedia.org/wiki/Philosophy")) {
+			Elements paragraphs = wf.fetchWikipedia(url);
+
+			Element firstPara = paragraphs.get(0);
+
+			Iterable<Node> iter = new WikiNodeIterable(firstPara);
+			for (Node node : iter) {
+				if (node instanceof Element) {
+
+					String nodeString = node.toString();
+					int parenthesisIndex = nodeString.indexOf("(");
+					int parenthesisIndex2 = nodeString.indexOf(")");
+					int index = nodeString.indexOf("/wiki/");
+
+					if(parenthesisIndex < index) {
+						nodeString = nodeString.substring(parenthesisIndex2);
+						index = nodeString.indexOf("/wiki/");
+					}
+
+					nodeString = nodeString.substring(index);
+					int index2 = nodeString.indexOf("\"");
+					String newURL = nodeString.substring(0, index2);
+					System.out.println("New URL: " + newURL);
+
+					clickCount++;
+
+					url = "https://en.wikipedia.org" + newURL;
+
+					break;
+				}
 			}
-        }
+		}
 
-        // the following throws an exception so the test fails
-        // until you update the code
-        String msg = "Complete this lab by adding your code and removing this statement.";
-        throw new UnsupportedOperationException(msg);
+		System.out.println("Number of clicks: " + clickCount);
+
+
 	}
 }
